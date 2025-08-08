@@ -287,7 +287,7 @@ class XtrapayProcessController extends Controller
                     $user->save();
 
                     // Send webhook notification
-                    WebhookService::sendCompletedTransaction($transaction, $user);
+                    WebhookService::sendSuccessfulTransaction($transaction, $user);
 
                     // Send notification
                     $message = $user->email . "| funded |  NGN " . number_format($transaction->amount) . " | with ref | $reference |  on FaddedSMS via PayVibe";
