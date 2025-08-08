@@ -260,6 +260,253 @@ Route::get('test-payvibe-funding', [HomeController::class,'test_payvibe_funding'
 Route::get('test-payvibe-webhook', [PayVibeWebhookController::class,'testWebhook']);
 Route::get('payvibe-webhook-status', [PayVibeWebhookController::class,'webhookStatus']);
 Route::get('test-payvibe-endpoint', [PayVibeWebhookController::class,'testWebhookEndpoint']);
+Route::get('/test-notification', function() {
+    $testMessage = "🧪 TEST NOTIFICATION\n\n" .
+                   "💰 PayVibe Payment Test\n" .
+                   "👤 User: test@example.com\n" .
+                   "💳 Reference: TEST_REF_123\n" .
+                   "💰 Amount: NGN 1,000\n" .
+                   "⏰ Time: " . now()->format('Y-m-d H:i:s') . "\n" .
+                   "🔄 Status: ✅ TEST SUCCESSFUL";
+    
+    $result = send_notification($testMessage);
+    
+    return response()->json([
+        'notification_sent' => $result,
+        'message' => $testMessage,
+        'telegram_bot' => '7515872256:AAHDrG_LeWM23KVDJ9YF2WiKRCDmebgca0o',
+        'chat_id' => '7174457646'
+    ]);
+});
+
+Route::get('/test-payvibe-complete', function() {
+    return response()->json([
+        'payvibe_process' => [
+            'step_1' => 'User initiates PayVibe funding',
+            'step_2' => 'PayVibe API generates virtual account',
+            'step_3' => 'User makes payment to virtual account',
+            'step_4' => 'PayVibe sends webhook to our system',
+            'step_5' => 'Our system processes payment and credits user',
+            'step_6' => 'Notifications sent to Telegram and XtraPay'
+        ],
+        'notifications' => [
+            'telegram' => [
+                'bot_token' => '7515872256:AAHDrG_LeWM23KVDJ9YF2WiKRCDmebgca0o',
+                'chat_id' => '7174457646',
+                'status' => '✅ Working'
+            ],
+            'xtrapay' => [
+                'webhook_url' => 'https://xtrapay.cash/api/webhook/receive-transaction',
+                'api_code' => 'k3q6fhck',
+                'api_key' => 'cwPtTwEuKCMy8qYCi9cffr7WDcgqeVNmki1d9kWV6jtp6UyAR4ehoTNHUjbnDLh4',
+                'status' => '✅ Working'
+            ]
+        ],
+        'test_endpoints' => [
+            'payvibe_api' => 'http://localhost:8000/test-payvibe-funding',
+            'payvibe_webhook' => 'http://localhost:8000/test-payvibe-webhook',
+            'xtrapay_webhook' => 'http://localhost:8000/test-xtrapay-simple',
+            'notification_test' => 'http://localhost:8000/test-notification'
+        ],
+        'system_status' => '✅ All systems operational'
+    ]);
+});
+
+Route::get('/test-xtrapay-simple', function() {
+    try {
+        $webhookUrl = env('XTRABUSINESS_WEBHOOK_URL', 'https://xtrapay.cash/api/webhook/receive-transaction');
+        $apiKey = env('XTRABUSINESS_API_KEY', '');
+        $apiCode = env('XTRABUSINESS_API_CODE', 'faddedsms');
+
+        // Simple test payload
+        $payload = [
+            'site_api_code' => $apiCode,
+            'reference' => 'TEST_SIMPLE_' . time(),
+            'amount' => 100,
+            'currency' => 'NGN',
+            'status' => 'success',
+            'payment_method' => 'payvibe',
+            'customer_email' => 'test@example.com',
+            'customer_name' => 'Test User',
+            'description' => 'Simple test transaction',
+            'external_id' => '999',
+            'timestamp' => now()->toISOString()
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'Faddedsms-Webhook/1.0'
+        ];
+        
+        if (!empty($apiKey)) {
+            $headers['X-API-Key'] = $apiKey;
+        }
+
+        $response = \Illuminate\Support\Facades\Http::withHeaders($headers)
+            ->timeout(30)
+            ->post($webhookUrl, $payload);
+
+        return response()->json([
+            'success' => $response->successful(),
+            'status_code' => $response->status(),
+            'response_body' => $response->body(),
+            'payload_sent' => $payload,
+            'headers_sent' => $headers,
+            'debug' => [
+                'webhook_url' => $webhookUrl,
+                'api_key_length' => strlen($apiKey),
+                'api_code' => $apiCode
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+});
+
+Route::get('/test-webhook-service', function() {
+    try {
+        // Create a test transaction
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json(['error' => 'No users found in database']);
+        }
+
+        $transaction = new \App\Models\Transaction();
+        $transaction->user_id = $user->id;
+        $transaction->amount = 100; // Original amount credited to user
+        $transaction->ref_id = 'TEST_WEBHOOK_SERVICE_' . time();
+        $transaction->method = 119; // PayVibe method
+        $transaction->type = 2;
+        $transaction->status = 2; // Successful
+        $transaction->final_amount = 115; // Amount with charges
+        $transaction->charge = 15; // Charges
+        $transaction->save();
+
+        // Test WebhookService
+        $result = \App\Services\WebhookService::sendSuccessfulTransaction($transaction, $user);
+        
+        return response()->json([
+            'webhook_sent' => $result,
+            'transaction_id' => $transaction->id,
+            'user_email' => $user->email,
+            'original_amount' => $transaction->amount,
+            'final_amount' => $transaction->final_amount,
+            'charges' => $transaction->charge,
+            'reference' => $transaction->ref_id,
+            'amount_sent_to_xtrapay' => $transaction->amount, // Should be 100
+            'debug' => [
+                'webhook_url' => env('XTRABUSINESS_WEBHOOK_URL'),
+                'api_key_configured' => !empty(env('XTRABUSINESS_API_KEY')),
+                'api_code' => env('XTRABUSINESS_API_CODE')
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+});
+
+Route::get('/test-xtrapay-webhook', function() {
+    try {
+        // Create a test transaction
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json(['error' => 'No users found in database']);
+        }
+
+        $transaction = new \App\Models\Transaction();
+        $transaction->user_id = $user->id;
+        $transaction->amount = 100; // Test with 100 NGN
+        $transaction->ref_id = 'TEST_XTRAPAY_100_' . time();
+        $transaction->method = 119; // PayVibe method
+        $transaction->type = 2;
+        $transaction->status = 2; // Successful
+        $transaction->final_amount = 115; // Amount with charges (100 + 15)
+        $transaction->charge = 15; // Charges for 100 NGN
+        $transaction->save();
+
+        // Debug webhook configuration
+        $webhookUrl = env('XTRABUSINESS_WEBHOOK_URL', 'https://xtrapay.cash/api/webhook/receive-transaction');
+        $apiKey = env('XTRABUSINESS_API_KEY', '');
+        $apiCode = env('XTRABUSINESS_API_CODE', 'faddedsms');
+
+        // Test direct HTTP request to XtraPay with minimal payload
+        $payload = [
+            'site_api_code' => $apiCode,
+            'reference' => $transaction->ref_id,
+            'amount' => 100,
+            'currency' => 'NGN',
+            'status' => 'success',
+            'payment_method' => 'payvibe',
+            'customer_email' => $user->email,
+            'customer_name' => $user->name ?? 'Test User',
+            'description' => 'Test PayVibe transaction - 100 NGN',
+            'external_id' => (string) $transaction->id,
+            'timestamp' => now()->toISOString()
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'Faddedsms-Webhook/1.0'
+        ];
+        
+        if (!empty($apiKey)) {
+            $headers['X-API-Key'] = $apiKey;
+        }
+
+        // Test using WebhookService (which was working)
+        $webhookResult = \App\Services\WebhookService::sendSuccessfulTransaction($transaction, $user);
+        
+        // Test with the exact payload that was working earlier
+        $workingPayload = [
+            'site_api_code' => $apiCode,
+            'reference' => $transaction->ref_id,
+            'amount' => 1100,
+            'currency' => 'NGN',
+            'status' => 'success',
+            'payment_method' => 'payvibe',
+            'customer_email' => $user->email,
+            'customer_name' => $user->name ?? 'Test User',
+            'description' => 'Test PayVibe transaction',
+            'external_id' => (string) $transaction->id,
+            'timestamp' => now()->toISOString()
+        ];
+        
+        $response = \Illuminate\Support\Facades\Http::withHeaders($headers)
+            ->timeout(30)
+            ->post($webhookUrl, $workingPayload);
+
+        return response()->json([
+            'webhook_sent' => $webhookResult,
+            'direct_http_sent' => $response->successful(),
+            'transaction_id' => $transaction->id,
+            'user_email' => $user->email,
+            'original_amount' => $transaction->amount,
+            'final_amount' => $transaction->final_amount,
+            'charges' => $transaction->charge,
+            'reference' => $transaction->ref_id,
+            'payload_sent' => $payload,
+            'debug' => [
+                'webhook_url' => $webhookUrl,
+                'api_key_configured' => !empty($apiKey) && $apiKey !== 'your_api_key_here',
+                'api_code' => $apiCode,
+                'webhook_service_result' => $webhookResult,
+                'direct_http_status' => $response->status(),
+                'direct_http_response' => $response->body()
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+});
 
 
 

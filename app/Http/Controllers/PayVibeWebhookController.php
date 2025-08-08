@@ -136,6 +136,22 @@ class PayVibeWebhookController extends Controller
 
                 send_notification($adminMessage);
 
+                // Send notification to XtraPay Business
+                try {
+                    WebhookService::sendSuccessfulTransaction($transaction, $user);
+                    Log::info('PayVibeWebhook: XtraPay notification sent successfully', [
+                        'transaction_id' => $transaction->id,
+                        'user_id' => $user->id,
+                        'reference' => $reference
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('PayVibeWebhook: Failed to send XtraPay notification', [
+                        'transaction_id' => $transaction->id,
+                        'error' => $e->getMessage(),
+                        'reference' => $reference
+                    ]);
+                }
+
                 // Send user notification (if you have user notification system)
                 $this->sendUserNotification($user, $transaction);
 

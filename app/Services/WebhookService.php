@@ -17,16 +17,24 @@ class WebhookService
         try {
             // Xtrabusiness webhook configuration
             $webhookUrl = env('XTRABUSINESS_WEBHOOK_URL', 'https://xtrapay.cash/api/webhook/receive-transaction');
-            $apiKey = env('XTRABUSINESS_API_KEY', '');
+            $apiKey = env('XTRAPAY_ACCESS_KEY', env('XTRABUSINESS_API_KEY', ''));
             $apiCode = env('XTRABUSINESS_API_CODE', 'faddedsms');
 
-            if (empty($webhookUrl) || empty($apiKey)) {
-                Log::warning('Xtrabusiness webhook not configured', [
+            if (empty($webhookUrl)) {
+                Log::warning('Xtrabusiness webhook URL not configured', [
                     'transaction_id' => $transaction->id,
-                    'webhook_url' => $webhookUrl,
-                    'has_api_key' => !empty($apiKey)
+                    'webhook_url' => $webhookUrl
                 ]);
                 return false;
+            }
+
+            // If API key is not configured, still send webhook but log it
+            if (empty($apiKey) || $apiKey === 'your_api_key_here') {
+                Log::warning('Xtrabusiness API key not configured, sending without authentication', [
+                    'transaction_id' => $transaction->id,
+                    'api_key_configured' => !empty($apiKey) && $apiKey !== 'your_api_key_here'
+                ]);
+                $apiKey = ''; // Send without API key
             }
 
             // Determine payment method based on transaction method
@@ -39,13 +47,23 @@ class WebhookService
             }
 
             // Calculate the amount to send to XtraPay Business
-            // For PayVibe transactions, use the final_amount (which is already after our charges)
-            $amountForXtraPay = $transaction->final_amount ?? $transaction->amount;
+            // We should send the amount that was credited to the user (original amount)
+            $amountForXtraPay = $transaction->amount; // Send the original amount credited to user
+            
+            // Calculate charges for PayVibe transactions
+            $additionalCharges = 0;
+            $fixedCharge = 0;
             
             if ($transaction->method == 119) { // PayVibe method
-                // The final_amount is already the amount after our charges
-                // Just round it to the nearest 100 for XtraPay Business
-                $amountForXtraPay = round($amountForXtraPay / 100) * 100;
+                // Calculate charges based on the original amount
+                $originalAmount = $transaction->amount;
+                
+                // Fixed charge: 100 NGN
+                $fixedCharge = 100;
+                
+                // Percentage charge: 1.5% for amounts < 10,000, 2% for amounts >= 10,000
+                $percentageRate = $originalAmount >= 10000 ? 0.02 : 0.015;
+                $additionalCharges = round($originalAmount * $percentageRate, 2);
             }
             
             // Prepare the webhook payload
@@ -69,7 +87,7 @@ class WebhookService
                     'our_additional_charges' => $transaction->method == 119 ? ($additionalCharges + $fixedCharge) : 0,
                     'percentage_charge' => $transaction->method == 119 ? $additionalCharges : 0,
                     'fixed_charge' => $transaction->method == 119 ? $fixedCharge : 0,
-                    'amount_before_rounding' => $transaction->method == 119 ? ($transaction->final_amount ?? $transaction->amount) - ($additionalCharges + $fixedCharge) : $amountForXtraPay,
+                    'amount_credited_to_user' => $transaction->amount,
                     'amount_sent_to_xtrapay' => $amountForXtraPay,
                     'charge' => $transaction->charge ?? null,
                     'payment_reference' => $transaction->ref_id,
@@ -80,11 +98,23 @@ class WebhookService
             ];
 
             // Send webhook
-            $response = Http::withHeaders([
+            $headers = [
                 'Content-Type' => 'application/json',
-                'X-API-Key' => $apiKey,
                 'User-Agent' => 'Faddedsms-Webhook/1.0'
-            ])->timeout(30)->post($webhookUrl, $payload);
+            ];
+            
+            if (!empty($apiKey)) {
+                $headers['X-API-Key'] = $apiKey;
+            }
+            
+            Log::info('Xtrabusiness webhook sending', [
+                'transaction_id' => $transaction->id,
+                'webhook_url' => $webhookUrl,
+                'headers' => $headers,
+                'payload' => $payload
+            ]);
+            
+            $response = Http::withHeaders($headers)->timeout(30)->post($webhookUrl, $payload);
 
             // Log the response
             Log::info('Xtrabusiness webhook sent', [
