@@ -411,6 +411,94 @@ Route::get('/test-webhook-service', function() {
     }
 });
 
+Route::get('/test-calculation-breakdown', function() {
+    // Test calculation breakdown for 1000 NGN
+    $userAmount = 1000; // Amount user wants to fund
+    
+    // Calculate charges
+    $fixedCharge = 100; // Fixed charge
+    $percentageRate = $userAmount >= 10000 ? 0.02 : 0.015; // 1.5% for < 10,000, 2% for >= 10,000
+    $percentageCharge = round($userAmount * $percentageRate, 2);
+    $totalCharges = $fixedCharge + $percentageCharge;
+    
+    // Calculate final amount user pays
+    $finalAmount = round($userAmount + $totalCharges, 0);
+    
+    // Calculate what goes to different parties
+    $amountCreditedToUser = $userAmount; // User gets their original amount
+    $amountSentToXtraPay = $userAmount; // XtraPay gets the original amount
+    $platformProfit = $totalCharges; // Platform keeps the charges
+    
+    return response()->json([
+        'calculation_breakdown' => [
+            'user_input' => [
+                'amount_user_wants' => $userAmount,
+                'currency' => 'NGN'
+            ],
+            'charges_calculation' => [
+                'fixed_charge' => $fixedCharge,
+                'percentage_rate' => $percentageRate * 100 . '%',
+                'percentage_charge' => $percentageCharge,
+                'total_charges' => $totalCharges
+            ],
+            'payment_breakdown' => [
+                'amount_user_pays' => $finalAmount,
+                'amount_credited_to_user' => $amountCreditedToUser,
+                'amount_sent_to_xtrapay' => $amountSentToXtraPay,
+                'platform_profit' => $platformProfit
+            ],
+            'summary' => [
+                'user_pays' => 'NGN ' . number_format($finalAmount),
+                'user_gets' => 'NGN ' . number_format($amountCreditedToUser),
+                'xtrapay_receives' => 'NGN ' . number_format($amountSentToXtraPay),
+                'platform_keeps' => 'NGN ' . number_format($platformProfit)
+            ]
+        ],
+        'example_transaction' => [
+            'reference' => 'EXAMPLE_REF_' . time(),
+            'user_email' => 'user@example.com',
+            'payment_method' => 'payvibe',
+            'status' => 'success'
+        ]
+    ]);
+});
+
+Route::get('/test-calculation-examples', function() {
+    $examples = [];
+    
+    // Test different amounts
+    $testAmounts = [100, 500, 1000, 5000, 10000, 20000];
+    
+    foreach ($testAmounts as $userAmount) {
+        // Calculate charges
+        $fixedCharge = 100;
+        $percentageRate = $userAmount >= 10000 ? 0.02 : 0.015;
+        $percentageCharge = round($userAmount * $percentageRate, 2);
+        $totalCharges = $fixedCharge + $percentageCharge;
+        $finalAmount = round($userAmount + $totalCharges, 0);
+        
+        $examples[] = [
+            'user_wants' => $userAmount,
+            'fixed_charge' => $fixedCharge,
+            'percentage_rate' => $percentageRate * 100 . '%',
+            'percentage_charge' => $percentageCharge,
+            'total_charges' => $totalCharges,
+            'user_pays' => $finalAmount,
+            'user_gets' => $userAmount,
+            'platform_profit' => $totalCharges
+        ];
+    }
+    
+    return response()->json([
+        'calculation_examples' => $examples,
+        'charge_structure' => [
+            'fixed_charge' => 'NGN 100 (always)',
+            'percentage_charge' => '1.5% for amounts < NGN 10,000',
+            'percentage_charge_high' => '2% for amounts >= NGN 10,000'
+        ]
+    ]);
+});
+
 Route::get('/test-xtrapay-webhook', function() {
     try {
         // Create a test transaction
