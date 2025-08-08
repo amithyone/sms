@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white"><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="">
+
+    <meta name="google-site-verification" content="0yM3122f4iiwy1_XWDgzDjBZRG-FrzGNmFYopS7a0ag">
+    <meta name="google-adsense-account" content="ca-pub-8574977093637478">
+
+    <link rel="stylesheet" href="../../_content/FrontendApp/app.css" />
+    <link rel="icon" href="../../_content/FrontendApp/favicon.ico" />
+
+
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-623377992"></script>
+
+
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'AW-623377992');
+    </script>
+
+
+    <script type="text/javascript" defer>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-NV39G73');
+    </script>
+
+    <script type="text/javascript" defer>
+        const waitForElement = async (selector) => {
+            return new Promise(resolve => {
+                if (document.querySelector(selector)) {
+                    return resolve(document.querySelector(selector));
+                }
+                const observer = new MutationObserver(mutations => {
+                    if (document.querySelector(selector)) {
+                        resolve(document.querySelector(selector));
+                        observer.disconnect();
+                    }
+                });
+                observer.observe(document.body,
+                    {
+                        childList: true,
+                        subtree: true
+                    });
+            });
+        }
+        const scrollToElementId = async (elementId) => {
+            var target = await waitForElement("[id='" + elementId + "']");
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+        const scrollToRelativeElementId = async (elementId) => {
+            var target = await waitForElement("[id='" + elementId + "']");
+            target.scrollTop = 0;
+        }
+        window.waitForElement = waitForElement;
+        window.scrollToElementId = scrollToElementId;
+        window.scrollToRelativeElementId = scrollToRelativeElementId;
+    </script>
+
+    <!--Blazor:{"type":"server","prerenderId":"9fdac9bcb75844e7995d87168134b598","key":{"locationHash":"77D12F14A8105320B1AAED6AE7E689DA0EC4483270A645E84079EAA0FFDF550D:17","formattedComponentKey":""},"sequence":0,"descriptor":"CfDJ8EYeklXx2mJPjNTXtKRx3veR3VG3DbZPNX5Vib1FCZg66dqvQdkybTIxqfcsc7tlSx1RdkxPp8GL8lRhjThSZxcWWlNRFqerUmMrsxIQ8BAKu5pDPeIGIFm9xj0ukznrm9RHUc5FZGi5heRuWUExP2SbhDIztsZ\u002BzUcAm/ZIOo\u002B0gxubKm//CR0SBTKZN/wgNLoHDfUF9UsL89OFE9MLHfWdNWkFb6/xing1ntHetSoNkvs8WYPjrQ2L\u002BGFsdh0cvAj3IrrkqhdamnJN73k71oBruLstiimd8LJCecE/5YxeKEqwRW68Gi9XF6eNwSa4mm\u002BLdEdT3Urw0SXO25vztu5i\u002BfWQvY/KVc5O53b7jtB7OkA3U3bqbmANBIpzPrO3ui57WKcMnRzC6gl\u002BSQGciwMYNjKvMNbIALFq0T4V5oIqyEDPbKEXvRCr6Vl6hVtOohAXpP5Vz5U38pFlfd10eL5KeUmVrEepaHd6XPJZacMXn1ohyaaQuFdczfDodCUZ9qA62Lxj6Arkzbwgb5AV7KlALXHNqy68SveCTIRIyBVnbdpQrSQ9rc1uZHiWtDszRz8AeDlElVRk7y7Ep33xl/0="}--><style type="text/css">@font-face {font-family:Fira Code;font-style:normal;font-weight:400;src:url(../../cf-fonts/s/fira-code/5.0.16/cyrillic-ext/400/normal.woff2.html);unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-display:swap;}@font-face {font-family:Fira Code;font-style:normal;font-weight:400;src:url(../../cf-fonts/s/fira-code/5.0.16/greek-ext/400/normal.woff2.html);unicode-range:U+1F00-1FFF;font-display:swap;}@font-face {font-family:Fira Code;font-style:normal;font-weight:400;src:url(../../cf-fonts/s/fira-code/5.0.16/latin-ext/400/normal.woff2.html);unicode-range:U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;font-display:swap;}@font-face {font-family:Fira Code;font-style:normal;font-weight:400;src:url(../../cf-fonts/s/fira-code/5.0.16/greek/400/normal.woff2.html);unicode-range:U+0370-03FF;font-display:swap;}@font-face {font-family:Fira Code;font-style:normal;font-weight:400;src:url(../../cf-fonts/s/fira-code/5.0.16/latin/400/normal.woff2.html);unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-display:swap;}@font-face {font-family:Fira Code;font-style:normal;font-weight:400;src:url(../../cf-fonts/s/fira-code/5.0.16/cyrillic/400/normal.woff2.html);unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;font-display:swap;}</style>
+    <title>API Documentation | Textverified</title>
+    <meta name="description" content="Get started with our API to build new applications and programatically access Textverified's services. Automate receiving SMS codes, text messages, voice calls, and much more with our simple API.">
+    <link rel="canonical" href="v2.html" />
+    <style>
+        rapi-doc::part(btn) {
+            border-radius: 6px;
+            padding: 8px 12px 8px 12px;
+        }
+
+        rapi-doc::part(anchor) {
+            color: #0369a1;
+        }
+
+        rapi-doc {
+            color: black;
+        }
+    </style>
+    <script type="module" src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script><!--Blazor:{"prerenderId":"9fdac9bcb75844e7995d87168134b598"}--></head>
+
+<body class="h-full bg-gray-50 ligatures-no-contextual"><noscript><iframe alt="google tag manager" src="https://www.googletagmanager.com/ns.html?id=GTM-NV39G73" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+
+    <!--Blazor:{"type":"server","prerenderId":"1db2d6864c67485db944d8b71e4b7727","key":{"locationHash":"6040387254490E1D94EAC590A2E8E3C8DB27545D071DBF9E1F8E0D3637E23556:22","formattedComponentKey":""},"sequence":1,"descriptor":"CfDJ8EYeklXx2mJPjNTXtKRx3vc2t5RbK1RHRZyokqoRtO26OT4tp66P1K8kkxNly8IlAzKWP9ciGSbzuDt0pN\u002B8fvm9/KhtEYj/3CjdiJtZFOVxHn0fszGUNuUQ9jlS226QbaDM75rQoVdZIo6Bw\u002Btr82i/nTZP8j/UVLf6jSxAs2A6e\u002BpqTT3JUF7V042KQ2BqS0uTRXqUIIHRl/qipxY5VaRGDuHE8T4XYp8YBjuIDljxFZ2zGooODgFp1/wlN5Gk7s4AC7nzuPbfM2EASd8GI8Qhf6Frhc61oczYxfCEPaXi5gEGqrdVr6dONcmGPcMYjJJeigwfNIIDr/TjGqty\u002BfrCa06d7QW7FaBHdQY7osbFcrOFJeChPhpT/JfLUA7s\u002BuC21Jx5DqzVpxO2kxrCbFsUrVYMGSXmtpx3KF1VZ49QHzLKk8UksuWdu4G8Dk3\u002BEd7UpIR1cStMuZQK6G1PDJ0u3Lt\u002BOCXCxDAX7vuwHmAmPvwPQEDOAYiKwjlMTQfMhGVwS5V7kjL3TB8SX8hHcgwf\u002BnlskbGx5RAp1MAJBOgGLLCDLWLzCZOlHkaIP4BfKzYeVOTIZWCQinCGRq1LG4j4T0lJqE\u002BHoT3CL70NAD\u002Bm9c/2iuIJ7hcj4VfsaFaBhSHMn/5WJ\u002B5TkPfixQEh5VJ9B6/hKekDVfZSMUOgHzKLmk/cDEq60kMboesfqslkNU/r1FihQlA4hS5YporRKxqjUiSpqHLhpBtyJbuK3ujI\u002BIrfrRUepM3Uw9a5daqqA8lOemjrnAt\u002BWe20QdNYJmbJJlPj/AShn8IhUm1di0TWl0MlUCHDieJ00HPeBU\u002B4rTrQVS8KpfKr/O874JeqqT2Wm3WqxWPu1mcB7o2shsNcrceknGhm2VibvDGpeU/vcSsAb4EfmqCKNZoRo/9oKxxKFdLS0eO6UBWqgle2/TEezqOdUZif5LqqFKGrUsCg\u002BAvzvxOettAFEqYLFfTsuhK25E0nAd0UGuJ1aZLKli4y4sqi0X2Ry/Hv57abQw7dtEqnYUW4ILzi3AkZ\u002B\u002B2kgyUdVo2pJuPdLrOk1MFV1jmXaro9Mx0OhDRX/sl6LzhHO\u002BLDX9GKTTtGNoSuWBWgcdMflK7jzVcE1T3s5aAkBaHk"}-->
+
+
+<rapi-doc show-header="false" nav-bg-color="#f9fafb" primary-color="#0369a1" bg-color="#ffffff" heading-text="Inter, sans-serif;" regular-font="Inter, sans-serif;" mono-font="Fira Code, mono;" schema-description-expanded="true" show-method-in-nav-bar="as-colored-text" nav-item-spacing="relaxed" spec-url="https://www.textverified.com/swagger/v2/swagger.json" persist-auth="true"></rapi-doc>
+
+    <div class="invisible relative z-40" role="dialog" aria-modal="true"><div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm ease-in duration-300 opacity-0"></div>
+        <div class="fixed inset-0 overflow-y-auto text-sm text-gray-500"><div class="flex h-full items-center justify-center text-center sm:p-0"><div class="sm:max-w-[38rem] max-w-full sm:min-w-[10rem] min-w-full sm:max-h-[90vh] max-h-[80vh] min-h-[10rem] flex flex-col sm:relative fixed bottom-0 m-0 sm:m-4 z-30 transform transition-opacity overflow-hidden rounded-lg bg-white sm:p-9 p-5 text-left shadow-xl transition-all sm:my-8 ease-in duration-300 opacity-0 translate-y-4 sm:translate-y-0"></div></div></div></div>
+
+<!--Blazor:{"prerenderId":"1db2d6864c67485db944d8b71e4b7727"}-->
+
+    <script src="../../_framework/blazor.web.js"></script></body></html><!--Blazor-Server-Component-State:CfDJ8EYeklXx2mJPjNTXtKRx3vcqpsT6IfOB6fu3E4XCVyZu4U6PIRsoKsDP2/OWlJQjeYQBZNenJlpJ8UWJ/xhViUn9rtfjXCYZ1huTO7r6dLHGredAHLkvf8qL7HK4c4SY+EnJ6Xj+/IiGZcDkjCbys0MqEwVvO0NMEm5MkEA0kHSkmrsBk+Hz1BaBTv53Asw3loyFN0D/OjTswq1mj87bHzYIA1JnYJvMD1w/sxOyvu51HH80RLXcqUiCTtprZSEyZfH1ztFSBCtCoMib/48a1cCh5J5fOYGbF3noPuWQuDaHTorXD4iunLu57nqm5XJWnLneb152WKVVj13keW+eQrHhNdJMM58uDBmUul928jN/JyxHtoCuuj66QSU9RulcbZaI94dOFNmStf/KmCo5fTs9y9hn7rXfut7w/3UfdEhbipNtDlKm4yIHzUo87eVfPqgH3jXPRG0IgzBJEl66trsdLYP5LrfNvwH487L1xdTaiSIqyG4LcjftdgvU+A8YZa2snvjr6ypsxWNstIF9EgrcfMSEOoonlk1IcqlnaT/8--><!--Blazor-WebAssembly-Component-State:eyJfX2ludGVybmFsX19BbnRpZm9yZ2VyeVJlcXVlc3RUb2tlbiI6ImV5SjJZV3gxWlNJNklrTm1SRW80UlZsbGEyeFllREp0U2xCcVRsUllkRXRTZUROMlptUlRSVU5tYldOelgxQkVRWFJrWDNKNlRIazFUa2t5WlRGTlNIbG9hSFJNVlVONlQzWTJNVWhHU3pKS2RIWTRjMXBOVVZGb2QybEpaREpZZUd4dldtVkVTa28wVEVSbVZrVlphazVVUlZCSmRrd3dhM1pZWmxsdE9GOTBiWGxUV0Y5TmJXVk1jVkp6ZEcwMVJISnRSR1Y0WTI0eWNWUlNVME5ETFU1aWVHSnZJaXdpWm05eWJVWnBaV3hrVG1GdFpTSTZJbDlmVW1WeGRXVnpkRlpsY21sbWFXTmhkR2x2YmxSdmEyVnVJbjA9In0=-->
