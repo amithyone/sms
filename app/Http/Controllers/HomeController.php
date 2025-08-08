@@ -1,8 +1,6 @@
-
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\AccountDetail;
 use Illuminate\Support\Facades\Http;
 use App\Models\Deposit;
