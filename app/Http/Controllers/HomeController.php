@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -441,7 +442,7 @@ class HomeController extends Controller
                 }
 
 
-                $key = env('XTRAPAY_ACCESS_KEY');
+                $key = env('XTRABUSINESS_API_KEY');
                 do {
                     $ref = substr(str_shuffle(time() . mt_rand(100000, 999999)), 0, 12);
                     $exists = Transaction::where('ref_id', $ref)->exists();

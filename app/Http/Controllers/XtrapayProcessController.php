@@ -23,7 +23,7 @@ class XtrapayProcessController extends Controller
         }
 
         // Retrieve access key securely
-        $accessKey = env('XTRAPAY_ACCESS_KEY', 'your_default_access_key');
+        $accessKey = env('XTRABUSINESS_API_KEY', 'your_default_access_key');
 
         // Compute expected hash
         $computedHash = hash_hmac('sha256', json_encode($payload['data']), $accessKey);
@@ -185,7 +185,7 @@ class XtrapayProcessController extends Controller
 
         // XtraPay API URL
         $url = "https://mobile.xtrapay.ng/api/faddedsocials/requeryTransaction/{$reference}";
-        $accessKey = env('XTRAPAY_ACCESS_KEY', 'your_default_access_key');
+        $accessKey = env('XTRABUSINESS_API_KEY', 'your_default_access_key');
 
         $response = Http::withToken($accessKey)->get($url);
 

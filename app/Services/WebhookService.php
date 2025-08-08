@@ -17,7 +17,7 @@ class WebhookService
         try {
             // Xtrabusiness webhook configuration
             $webhookUrl = env('XTRABUSINESS_WEBHOOK_URL', 'https://xtrapay.cash/api/webhook/receive-transaction');
-            $apiKey = env('XTRAPAY_ACCESS_KEY', env('XTRABUSINESS_API_KEY', ''));
+            $apiKey = env('XTRABUSINESS_API_KEY', '');
             $apiCode = env('XTRABUSINESS_API_CODE', 'faddedsms');
 
             if (empty($webhookUrl)) {
